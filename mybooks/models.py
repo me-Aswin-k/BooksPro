@@ -6,6 +6,9 @@ from django.db.models import Sum,Avg
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from embed_video.fields import EmbedVideoField
+
+
 # Create your models here.
 
 
@@ -13,7 +16,7 @@ class UserProfile(models.Model):
 
     bio = models.CharField(max_length=250,null=True)
 
-    profile_pic = models.ImageField(upload_to="profile_pictures",default="/profile_pictures/loginpic.png")
+    profile_pic = models.ImageField(upload_to="profile_pictures",default="profile_pictures/loginpic.png")
 
     user_object = models.OneToOneField(User,on_delete=models.CASCADE,related_name="profile")
 
@@ -34,7 +37,7 @@ class Category(models.Model):
 
     description = models.TextField(null=True)
 
-    image = models.ImageField(upload_to="category_images",default="/category_images/loginpic.png")
+    image = models.ImageField(upload_to="category_images",default="category_images/loginpic.png")
 
     def __str__(self) -> str:
 
@@ -50,7 +53,7 @@ class Book(models.Model):
 
     price = models.PositiveIntegerField(null=True)
 
-    category = models.CharField(max_length=100)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name="books")
 
     description = models.TextField()
 
@@ -98,7 +101,7 @@ class CartItems(models.Model):
 
     cart_object = models.ForeignKey(Cart,on_delete=models.CASCADE,related_name="basket_items")
 
-    product_object = models.ForeignKey(Book,on_delete=models.CASCADE)
+    book_object = models.ForeignKey(Book,on_delete=models.CASCADE)
 
     category_object = models.ForeignKey(Category,on_delete=models.CASCADE)
 
@@ -116,11 +119,11 @@ class CartItems(models.Model):
       
 
 
-class Ordersummary(models.Model):
+class OrderSummary(models.Model):
 
     user_object=models.ForeignKey(User,on_delete=models.CASCADE,related_name="orders")
 
-    product_objects=models.ManyToManyField(Book)
+    book_objects=models.ManyToManyField(Book)
 
     order_id=models.CharField(max_length=200,null=True)
 
@@ -133,11 +136,11 @@ class Ordersummary(models.Model):
 
     name=models.CharField(max_length=200,null=True)
 
-    address=models.CharField(max_length=200,null=True)
+    address=models.TextField(max_length=200,null=True)
 
     pincode=models.CharField(max_length=6,null=True)
 
-    phone=models.CharField(max_length=20,null=True,unique=True)
+    phone=models.CharField(max_length=20,null=True)
 
     is_paid=models.BooleanField(default=False)
     
@@ -193,3 +196,5 @@ def create_profile(sender,instance,created,*args,**kwargs):
         UserProfile.objects.create(user_object=instance)
 
 post_save.connect(sender=User,receiver=create_profile)
+
+

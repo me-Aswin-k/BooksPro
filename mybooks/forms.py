@@ -23,6 +23,7 @@ class SingUpForm(UserCreationForm):
         widgets={
 
             "username":forms.TextInput(attrs={"class":"form-control"}),
+
             "email":forms.EmailInput(attrs={"class":"form-control"}),
 
 
@@ -49,7 +50,9 @@ class UserProfileForm(forms.ModelForm):
         fields=["bio","profile_pic"]
 
         widgets={
+
             "bio":forms.TextInput(attrs={"class":"w-full border p-4 my-3"}),
+
             "profile_pic":forms.FileInput(attrs={"class":"w-full border p-4 my-3"}),
 
         }
@@ -80,6 +83,15 @@ class ReviewForm(forms.ModelForm):
 
     class Meta:
 
-        models= Reviews
+        model= Reviews
 
         fields=["comment","rating"]
+  
+        widgets = {
+
+            'rating': forms.NumberInput(attrs={'min': 1, 'max': 5}),
+
+            'comment': forms.Textarea(attrs={'rows': 3}),
+
+        }
+
